@@ -12,8 +12,9 @@ app.get('/', (req, res) => {
 
 //  Health Check
 app.get('/healthCheck', async (req, res) => {
+  const smtp = req.body.testSmtp ? "apps.smtp.extest.gov.bc.ca" : "apps.smtp.gov.bc.ca";
   let connection = new SMTPConnection({
-    host: "apps.smtp.gov.bc.ca",
+    host: smtp,
     port: 25,
     tls: {
       // do not fail on invalid certs
@@ -22,7 +23,7 @@ app.get('/healthCheck', async (req, res) => {
   });
   connection.connect(() => {
     res.send({
-      "apps.smtp.gov.bc.ca": true
+      smtp: smtp
     });
   });
 })
@@ -74,7 +75,7 @@ app.post('/message', async (req, res, next) => {
     } else {
       // Use the bc gov smtp server
       let transporter = nodemailer.createTransport({
-        host: "apps.smtp.gov.bc.ca",
+        host: req.body.testSmtp ? "apps.smtp.extest.gov.bc.ca" : "apps.smtp.gov.bc.ca",
         port: 25,
         tls: {
           // do not fail on invalid certs
